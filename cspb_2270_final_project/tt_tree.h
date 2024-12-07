@@ -3,12 +3,21 @@
 
 #include <memory>
 #include <string>
+#include <map>
 #include <vector>
 #include <iostream>
 
 using namespace std;
 
 #define TT_ORDER 3
+
+// data structure that contains area code, name, and occupation
+struct data_packet {
+  int area_code;
+  int phone_num;
+  string name;
+  string occupation;
+};
 
 // primary structure of the tt_tree
 struct tt_tree {
@@ -21,7 +30,10 @@ struct tt_tree {
 
   // keys is an array of values
   int keys[TT_ORDER];
-
+  
+  // area_code is a map of keys to area codes
+  map<int, data_packet*> data_map;
+  
   // is_leaf is true if this is a leaf, false otherwise
   bool is_leaf;
 
@@ -35,8 +47,8 @@ struct tt_tree {
   tt_tree* root;
 };
 
-// insert data (keys and children) to a node
-void insert(tt_tree*, int, tt_tree* = NULL, tt_tree* = NULL);
+// insert data (keys, data_packet and children) to a node.
+void insert(tt_tree*, data_packet*, tt_tree* = NULL, tt_tree* = NULL);
 
 // remove locates and deletes the provided key if it is present.
 void remove(tt_tree*, int);
@@ -53,6 +65,14 @@ int count_keys(tt_tree*);
 
 // HELPER FUNCTIONS //
 
+// instantiate and return a new data packet
+data_packet* create_data_packet(int, int, string, string);
+
+// helper function that creates new nodes; accepts an argument for
+// the parent node and the root node; so the child always knows its
+// parent and always knows the tree root node
+tt_tree* create_node(tt_tree*, tt_tree*);
+
 // helper function provides the matching index to the target if it
 // exists in the integer array
 int int_array_search(int [3], int);
@@ -61,11 +81,6 @@ int int_array_search(int [3], int);
 // exists in the tt_tree* array
 int node_array_search(tt_tree* [4], tt_tree*);
 
-// helper function that creates new nodes; accepts an argument for
-// the parent node and the root node; so the child always knows its
-// parent and always knows the tree root node
-tt_tree* create_node(tt_tree*, tt_tree*);
-
 // helper function that recursively searches for a target key
 // within a tt_tree* (root) and assigns that value to a
 // tt_tree* (location varible) that has been passsed in as
@@ -73,7 +88,7 @@ tt_tree* create_node(tt_tree*, tt_tree*);
 void find_recursive_helper(int, tt_tree*, tt_tree*&);
 
 // helper function to insert data into a node
-void insert_data_to_node(tt_tree*, int, tt_tree*, tt_tree*);
+void insert_data_to_node(tt_tree*, int, data_packet*, tt_tree*, tt_tree*);
 
 // helper function to shift data within a node to make
 // room for an insertion
@@ -96,6 +111,12 @@ void delete_and_replace_key(tt_tree*, int);
 // and condense that array. this is actually a little tedious to do
 // which is why I'm putting it in its own helper function.
 void delete_key_and_condense_key_array(tt_tree*, int);
+
+// helper function that inserts a data packet to a node.
+void insert_data_packet(tt_tree*, data_packet*);
+
+// helper function that removes a data packet from a node.
+void remove_data_packet(tt_tree*, int);
 
 // this helper function examines a specific node and determines if it's
 // overloaded (keys = 3); if it is, then it corrects that situation

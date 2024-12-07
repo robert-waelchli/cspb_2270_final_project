@@ -1,0 +1,5 @@
+(720) 555-1111, Jon Doe, Bricklayer
+(720) 555-1112, Jane Doe, Doctor
+(720) 555-1113, Fred Orange, Computer Programmer
+(720) 555-1114, Betty Grable, Technicain
+(720) 555-1115, Lee Zhang, Engineer

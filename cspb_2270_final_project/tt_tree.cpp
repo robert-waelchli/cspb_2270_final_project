@@ -5,8 +5,13 @@
 #include "tt_tree.h"
 #include "split_push_steal_merge_functions.h"
 
-// insert data (keys and children) to a node
-void insert(tt_tree* root, int key, tt_tree* left, tt_tree* right) {
+// insert data (keys, data_packet and children) to a node.
+void insert(tt_tree* root, data_packet* packet,
+            tt_tree* left, tt_tree* right) {
+  
+  // pull out the key for readability of code
+  int key = packet->phone_num;
+  
   // identify which node should receive the data
   tt_tree* node = find(root, key);
   
@@ -14,7 +19,7 @@ void insert(tt_tree* root, int key, tt_tree* left, tt_tree* right) {
   if (node == NULL) { return; }
 
   // attempt to insert the data into the node
-  insert_data_to_node(node, key, left, right);
+  insert_data_to_node(node, key, packet, left, right);
 }
 
 void remove(tt_tree* root, int key) {
@@ -28,12 +33,14 @@ void remove(tt_tree* root, int key) {
   // if requested, but take no other action
   if (root->is_leaf && root->num_keys == 1) {
     if (key == root->keys[0]) {
+      root->data_map.clear();
       root->keys[0] = 0;
       root->num_keys--;
     }
     return;
   }
     
+  // for all other cases:
   // identify which node should contain the data and the index
   // the data is located within that node
   int index;
@@ -80,28 +87,15 @@ int count_keys(tt_tree* root) {
 
 // HELPER FUNCTIONS //
 
-// helper function provides the matching index to the target if it
-// exists in the integer array
-int int_array_search(int array[3], int target){
-  int index = -1;
-  for (int ii = 0; ii < 3; ii++) {
-    if (array[ii] == target) {
-      index = ii;
-    }
-  }
-  return index;
-}
-
-// helper function provides the matching index to the target if it
-// exists in the tt_tree* array
-int node_array_search(tt_tree* array[4], tt_tree* target){
-  int index = -1;
-  for (int ii = 0; ii < 3; ii++) {
-    if (array[ii] == target) {
-      index = ii;
-    }
-  }
-  return index;
+// instantiate and return a new data packet
+data_packet* create_data_packet(int ac, int pn, string name, string occ) {
+  data_packet* packet = new data_packet();
+  packet->area_code = ac;
+  packet->phone_num = pn;
+  packet->name = name;
+  packet->occupation = occ;
+  
+  return packet;
 }
 
 tt_tree* create_node(tt_tree* parent, tt_tree* root) {
@@ -137,6 +131,30 @@ tt_tree* create_node(tt_tree* parent, tt_tree* root) {
   return ptr;
 }
 
+// helper function provides the matching index to the target if it
+// exists in the integer array
+int int_array_search(int array[3], int target){
+  int index = -1;
+  for (int ii = 0; ii < 3; ii++) {
+    if (array[ii] == target) {
+      index = ii;
+    }
+  }
+  return index;
+}
+
+// helper function provides the matching index to the target if it
+// exists in the tt_tree* array
+int node_array_search(tt_tree* array[4], tt_tree* target){
+  int index = -1;
+  for (int ii = 0; ii < 3; ii++) {
+    if (array[ii] == target) {
+      index = ii;
+    }
+  }
+  return index;
+}
+
 void find_recursive_helper(int target_key, tt_tree* node,
                            tt_tree*& location) {
   
@@ -167,8 +185,8 @@ void find_recursive_helper(int target_key, tt_tree* node,
   }
 }
 
- void insert_data_to_node(tt_tree* node, int data,
-                          tt_tree* left_child, tt_tree* right_child) {
+void insert_data_to_node(tt_tree* node, int data, data_packet* packet,
+                         tt_tree* left_child, tt_tree* right_child) {
    // determine insert location in the node
    // start by instantiating a counter and a boolean flag
    int insert_index = 0;
@@ -197,6 +215,9 @@ void find_recursive_helper(int target_key, tt_tree* node,
    if (right_child != NULL) {
      node->children[insert_index + 1] = right_child;
    }
+   
+   // insert the data packet into the node
+   insert_data_packet(node, packet);
 
    // increment num_keys
    node->num_keys++;
@@ -286,10 +307,13 @@ void delete_and_replace_key(tt_tree* node, int index) {
   int key = node->keys[index];
   
   // CASE 1 //
-  // if node is a leaf, simply remove the key and condense the array.
+  // if node is a leaf, simply remove the data/key and condense the array.
   if (node->is_leaf) {
     
-    // helper function performs the removal and condensing
+    // remove data from node
+    remove_data_packet(node, key);
+    
+    // helper function performs key removal and condensing
     delete_key_and_condense_key_array(node, index);
     
     // decrement counter
@@ -306,40 +330,46 @@ void delete_and_replace_key(tt_tree* node, int index) {
     
     // instantiate some place holders to be populated by the search
     // function
-    tt_tree* location;
+    tt_tree* swap_node;
     int swap_index;
-    int value;
+    int swap_key;
     
     // swap the target key with the next highest-value key
-    find_next_highest_key(node->root, key, location, swap_index, value);
-    node->keys[index] = value;
-    location->keys[swap_index] = key;
+    find_next_highest_key(node->root, key, swap_node, swap_index,
+                          swap_key);
+    node->keys[index] = swap_key;
+    node->data_map[swap_key] = swap_node->data_map[swap_key];
+    swap_node->keys[swap_index] = key;
+    swap_node->data_map[key] = node->data_map[key];
     
+    // remove the extra data_packets from each node map
+    node->data_map.erase(key);
+    swap_node->data_map.erase(swap_key);
     
     // helper function performs the key removal and condensing
     // from the child array.
-    delete_key_and_condense_key_array(location, swap_index);
+    delete_key_and_condense_key_array(swap_node, swap_index);
     
-    if (!location->is_leaf) {
+    if (!swap_node->is_leaf) {
       
       // have to merge the children at the location we removed from
-      tt_tree* merged_node = merge(location->children[swap_index],
-                                   location->children[swap_index + 1]);
+      tt_tree* merged_node = merge(swap_node->children[swap_index],
+                                   swap_node->children[swap_index + 1]);
       // place the merged node back into the removal location
-      location->children[swap_index] = merged_node;
-      location->children[swap_index + 1] = NULL;
+      swap_node->children[swap_index] = merged_node;
+      swap_node->children[swap_index + 1] = NULL;
       // update the num_children at the removal location
-      location->num_children = count_non_null_children(location);
+      swap_node->num_children = count_non_null_children(swap_node);
       
-      location->num_keys--;
+      swap_node->num_keys--;
       
-    } else if (location->is_leaf) {
+    } else if (swap_node->is_leaf) {
       
       // decrement the child node's counter
-      location->num_keys--;
+      swap_node->num_keys--;
       
       // now check if the leaf node has become too small
-      check_too_small(location);
+      check_too_small(swap_node);
     }
   }
 }
@@ -374,9 +404,19 @@ void delete_key_and_condense_key_array(tt_tree* node, int index) {
   }
 }
 
+// helper function that inserts a data packet to a node.
+void insert_data_packet(tt_tree* node, data_packet* packet) {
+  node->data_map[packet->phone_num] = packet;
+}
+
+// helper function that removes a data packet from a node.
+void remove_data_packet(tt_tree* node, int key) {
+  node->data_map.erase(key);
+}
+
 // helper functions checks if the size of the node is > 2 keys. if the
-// node is too large, it either splits into three (if root) or pushes
-// the middle element up to the parent (if not root).
+// node is too large, it either splits into three (root case) or pushes
+// the middle element up to the parent (not root case).
 void check_too_large(tt_tree* node) {
   // define a new tt_tree* root for readability
   tt_tree* root = node->root;
@@ -390,9 +430,8 @@ void check_too_large(tt_tree* node) {
     split_node_to_three_nodes(node);
     return;
     
-  // 3-key case, not root:
-  // in this case, we need need to push the middle key (and associated
-  // children) up to the parent
+  // 3-key case, not root:  in this case, we need need to push the
+  // middle key (and associated children) up to the parent
   } else if (node != root) {
     push_key_to_parent(node);
     return;
@@ -407,8 +446,7 @@ void check_too_small(tt_tree* &node) {
   if (node->num_keys > 0) {
     return;
     
-  // if node is root and has zero keys, then the newly merged
-  // child node becomes the new root node--tree decreases height
+  // if node is root and has zero keys, then the tree decreases height
   // by one level.
   } else if (node == node->root) {
     
@@ -461,6 +499,8 @@ void wipe_all_node_keys_and_kids(tt_tree* node) {
   node->children[TT_ORDER] = NULL;
   // reset num_keys
   node->num_keys = 0;
+  // erase all mapped data
+  node->data_map.clear();
 }
 
 // helper function counts non-null child array elements

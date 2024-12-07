@@ -16,10 +16,10 @@ void split_node_to_three_nodes(tt_tree* node) {
   // and create a child right
   tt_tree* right = create_node(node, node->root);
   
-  // populate left keys
-  insert(left, node->keys[0]);
-  // populate right keys
-  insert(right, node->keys[2]);
+  // populate left keys and data
+  insert(left, node->data_map[node->keys[0]]);
+  // populate right keys and data
+  insert(right, node->data_map[node->keys[2]]);
   
   if (!node->is_leaf) {
     // move left children (if any)
@@ -47,6 +47,7 @@ void split_node_to_three_nodes(tt_tree* node) {
   
   // wipe all keys and children in the current node
   int parking_spot = node->keys[1];
+  data_packet* parked_data = node->data_map[node->keys[1]];
   wipe_all_node_keys_and_kids(node);
   
   // set parent's children equal to the new left/right nodes
@@ -54,8 +55,9 @@ void split_node_to_three_nodes(tt_tree* node) {
   node->children[1] = right;
   node->num_children = count_non_null_children(node);
   
-  // set key[0] equal to the old key[1]
+  // set key[0] equal to the old key[1] and add data
   node->keys[0] = parking_spot;
+  insert_data_packet(node, parked_data);
   node->num_keys++;
   
   // current node is def no longer a leaf (if it ever was)
@@ -74,6 +76,7 @@ void push_key_to_parent(tt_tree* node) {
   // grab the elements of the center node that we need to keep;
   // change the parent of the children node to their new parent
   int key = node->keys[0];
+  data_packet* packet = node->data_map[key];
   tt_tree* left = node->children[0];
   left->parent = parent;
   tt_tree* right = node->children[1];
@@ -83,7 +86,7 @@ void push_key_to_parent(tt_tree* node) {
   delete(node);
   
   // insert the key and children to the parent node
-  insert_data_to_node(parent, key, left, right);
+  insert_data_to_node(parent, key, packet, left, right);
   
   // update the parent number of children
   parent->num_children = count_non_null_children(parent);
@@ -119,12 +122,13 @@ void steal_key_from_parent(tt_tree*& node) {
       merge_direction = "right";
   }
     
-  // steal the parents key
-  insert_data_to_node(node, key_to_steal, NULL, NULL);
+  // insert the parent's key/data
+  data_packet* packet_to_steal = parent->data_map[key_to_steal];
+  insert_data_to_node(node, key_to_steal, packet_to_steal, NULL, NULL);
   
-  // remove the stolen key from the parent's child array
-  int stolen_key_index = int_array_search(parent->keys,
-                                          key_to_steal);
+  // remove the stolen key/data from the parent
+  remove_data_packet(parent, key_to_steal);
+  int stolen_key_index = int_array_search(parent->keys, key_to_steal);
   delete_key_and_condense_key_array(parent, stolen_key_index);
     
   // decrement the parent's key counter
@@ -153,21 +157,21 @@ void steal_key_from_parent(tt_tree*& node) {
   
   // it should always work out that we can copy the child array value two
   // elements down from the merged node into the element location immediately
-  // next to the merged node. Then NULL the child array value two elements down
-  // This collapses the children array to account for the merged node in a way
-  // that's safe and reliable.
+  // next to the merged node. Then NULL the child array value two elements
+  // down. This collapses the children array to account for the merged node in
+  // a way that's safe and reliable.
   parent->children[merged_node_index + 1] =
   parent->children[merged_node_index + 2];
   
   parent->children[merged_node_index + 2] = NULL;
  
-  // after some merges is it neccessary to re-null some
+  // after some merges it becomes neccessary to re-null some
   // of the parent's children array elements
   for (int ii = parent->num_keys + 1; ii < TT_ORDER + 1; ii++) {
     parent->children[ii] = NULL;
   }
   
-  // update the parent's number of children
+  // finally update the parent's number of children
   parent->num_children = count_non_null_children(parent);
   
   // check if the new merged node is now too large
@@ -184,16 +188,18 @@ tt_tree* merge(tt_tree* left, tt_tree* right) {
   int ii = 0;
   int jj = ii;
   
-  // add left keys
+  // add left keys and data packets
   while (ii < left->num_keys) {
     ret->keys[jj] = left->keys[ii];
+    insert_data_packet(ret, left->data_map[left->keys[ii]]);
     ii++; jj++;
   }
   
-  // add right keys
+  // add right keys and data packets
   ii = 0;
   while (ii < right->num_keys) {
     ret->keys[jj] = right->keys[ii];
+    insert_data_packet(ret, right->data_map[right->keys[ii]]);
     ii++; jj++;
   }
   
@@ -236,7 +242,7 @@ tt_tree* merge(tt_tree* left, tt_tree* right) {
       // check if the merged child is too large
       check_too_large(ret->children[missing_child_index]);
       
-    // case where recursion is not rquired--one node has zero keys
+    // case where recursion is not rquired
     } else {
       ii = 0; jj = 0;
       
@@ -280,8 +286,11 @@ void clone_node(tt_tree* node_to_be_filled,
                 tt_tree* node_to_be_cloned) {
     
   // move all the keys and children over one-by-one
+  int quick_key;
   for (int ii = 0; ii < TT_ORDER; ii++) {
-    node_to_be_filled->keys[ii] = node_to_be_cloned->keys[ii];
+    quick_key = node_to_be_cloned->keys[ii];
+    node_to_be_filled->keys[ii] = quick_key;
+    insert_data_packet(node_to_be_filled, node_to_be_cloned->data_map[quick_key]);
     node_to_be_filled->children[ii] = node_to_be_cloned->children[ii];
   }
   node_to_be_filled->children[TT_ORDER] = node_to_be_cloned->children[TT_ORDER];
