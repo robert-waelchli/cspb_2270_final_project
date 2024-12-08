@@ -92,8 +92,8 @@ intermittent because it only sometimes appears when the program is trying create
 (if it's going to at all) sometime between the 15th and 25th insertion event, and I've never seen it before the 12th
 insertion event. Often, it does not appear at all before the 30th insertion which is the furthest I've ever tried to go.
 I've included a screenshot of the malloc error in project directory as "malloc_error.png." Unfortunately there simply isn't 
-time remaining for me to continue trying to troubleshoot this error, and although it limits the ultimate size of the tree
-I don't think it is critical to understanding the core functionality of the demonstration.</p>
+time remaining for me to continue trying to troubleshoot this error, and although it probably limits the ultimate size of 
+the tree, I don't think it is critical to understanding the core functionality of the demonstration.</p>
 <p></p>
 <p>Other than that, the program was overall challenging to create simply due to the volume of code required to implement
 a B-Tree (at least for me). Finding the time to work on this outside of work and family was especially problematic although
