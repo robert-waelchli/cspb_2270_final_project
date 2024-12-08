@@ -3,3 +3,8 @@
 (720) 555-1113, Fred Orange, Computer Programmer
 (720) 555-1114, Betty Grable, Technicain
 (720) 555-1115, Lee Zhang, Engineer
+(720) 555-1116, Zephram Cochrane, Scientist
+(720) 555-1117, Stanley Tool, Chef
+(720) 555-1118, Tiffany Patel, Data Scientist
+(720) 555-1119, Donna Smith, Real Estate
+(720) 555-1120, Blake Tap, Restaurateur

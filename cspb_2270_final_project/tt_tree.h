@@ -1,3 +1,10 @@
+//
+//  tt_tree.h
+//  cspb_2270_final_project
+//
+//  Created by Robert Waelchli on 12/02/24.
+//
+
 #ifndef TT_TREE_H
 #define TT_TREE_H
 
@@ -11,7 +18,7 @@ using namespace std;
 
 #define TT_ORDER 3
 
-// data structure that contains area code, name, and occupation
+// data structure that contains area code, phone number (doubles as the key), name, and occupation
 struct data_packet {
   int area_code;
   int phone_num;
@@ -66,7 +73,7 @@ int count_keys(tt_tree*);
 // HELPER FUNCTIONS //
 
 // instantiate and return a new data packet
-data_packet* create_data_packet(int, int, string, string);
+data_packet* create_data_packet(string);
 
 // helper function that creates new nodes; accepts an argument for
 // the parent node and the root node; so the child always knows its

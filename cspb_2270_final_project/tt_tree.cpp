@@ -1,3 +1,10 @@
+//
+//  tt_tree.cpp
+//  cspb_2270_final_project
+//
+//  Created by Robert Waelchli on 12/02/24.
+//
+
 #ifndef TT_TREE_CPP
 #define TT_TREE_CPP
 
@@ -88,19 +95,78 @@ int count_keys(tt_tree* root) {
 // HELPER FUNCTIONS //
 
 // instantiate and return a new data packet
-data_packet* create_data_packet(int ac, int pn, string name, string occ) {
+data_packet* create_data_packet(string formatted_string) {
+  
+  // instantiate a new packet from heap memory
   data_packet* packet = new data_packet();
-  packet->area_code = ac;
-  packet->phone_num = pn;
+  
+  // go character by character through the string until hitting
+  // the first comma (comma separated fields); the first three
+  // digits will be the area code, any remaining numbers will
+  // be the phone number.
+  char c;
+  int ii = 0;
+  int jj = 0;
+  string ac;
+  string pn;
+  c = formatted_string[ii];
+  while (ii < formatted_string.size() && c != ',') {
+    if(isdigit(c) && jj < 3) {
+      ac += c;
+      jj++;
+    } else if (isdigit(c)) {
+      pn += c;
+    }
+    ii++;
+    c = formatted_string[ii];
+  }
+  
+  // advance one character to get past the comma
+  ii++;
+  c = formatted_string[ii];
+  
+  // the next field will comprise the full name
+  string name;
+  while (ii < formatted_string.size() && c != ',') {
+    if(isalpha(c) || c == ' ') {
+      name += c;
+    }
+    ii++;
+    c = formatted_string[ii];
+  }
+  
+  // delete the leading space
+  name.erase(0, 1);
+  
+  // advance one character to get past the comma
+  ii++;
+  c = formatted_string[ii];
+  
+  // the next field will comprise the occupation
+  string occupation;
+  while (ii < formatted_string.size() && c != ',') {
+    if(isalpha(c) || c == ' ') {
+      occupation += c;
+    }
+    ii++;
+    c = formatted_string[ii];
+  }
+  
+  // delete the leading space
+  occupation.erase(0, 1);
+  
+  // convert all fields to strings and store the data
+  packet->area_code = stoi(ac);
+  packet->phone_num = stoi(pn);
   packet->name = name;
-  packet->occupation = occ;
+  packet->occupation = occupation;
   
   return packet;
 }
 
 tt_tree* create_node(tt_tree* parent, tt_tree* root) {
   // instantiate a new node and get a pointer to address
-  tt_tree* ptr = new tt_tree;
+  tt_tree* ptr = new tt_tree();
   ptr->parent = parent;
 
   // if the provided root is NULL, then this node is root; else
