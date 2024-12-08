@@ -33,6 +33,12 @@ directly (with no substitution or conversion) for the key of the record. Since I
 there is a small risk that two records could have the same seven-digit phone number, but I judged that risk to 
 be acceptably small with the limited size of the data sets I intended to use for this demonstration.</p>
 <p></p>
+<p>The three fields shown above are stored within a data structure (titled a "data_packet" within the code) that
+is itself stored via a Map inside the same node as the key. By applying the key (the same one used to find the 
+node within the tree) to the Map within the node, the relevant data_packet is retrieved. Since there are never
+more than two data_packets within any individual Node's Map, this ensures the data retrieval is nearly 
+instantaneous and the O(log N) time complexity for search functions [1] is maintained.</p>
+<p></p>
 <p>I wrote the program using Xcode on my Mac Mini. It has been stored on GitHub at the following repository:
 
   https://github.com/robert-waelchli/cspb_2270_final_project.git
