@@ -2,7 +2,16 @@
 //  print_functions.cpp
 //  cspb_2270_final_project
 //
-//  Created by Robert Waelchli on 12/02/24.
+//  File by Robert Waelchli on 12/02/24.
+//
+//  NOTE: THE CODE IN THIS FILE IS NOT MINE NOR AM I REPRESENTING IT AS
+//  MINE. IT IS TAKEN FROM AN EARLIER ASSIGNMENT FOR CONVENIENCE OF THE
+//  GRADER (to be able to visualize the trees for grading purposes).
+//
+//  This code was create by Dr. Curry Guinn and/or Chanheum Park.
+//  as part of the course CSPB-2270 at CU-Boulder.
+//  I am taking this course during the 2024 Fall Semester and this
+//  code was part of HW 5: B-Tree (Oct 15).
 //
 
 #ifndef PRINT_FUNCTIONS_CPP
