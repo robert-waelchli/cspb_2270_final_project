@@ -17,7 +17,7 @@ close to evenly across the tree. [2]</p>
 > 3. Each node is either a 2-node or a 3-node
 
 I have found in my research that there are some conflicts between sources as to additional invariants, however
-these three have been universal acorss definitions as far as I can tell.</p>
+these three have been universal across definitions as far as I can tell.</p>
 <p></p>
 <b>Project-Specific 2-3 Tree Implementation:</b>
 <p>For my project, I have chosen to implement a directory of professionals including the following fields:
@@ -71,7 +71,7 @@ has options for the following actions:
 > 6. Print current tree
 > 7. Quit and Exit
 
-Option 6, to print the current tree, copies code directly from the B-Tree Assignemnet #5 of our course, CSPB-2270. 
+Option 6, to print the current tree, copies code directly from the B-Tree Assignment #5 of our course, CSPB-2270. 
 [3] I judged this to be an acceptable re-use of that code--with attribution of course--given that the print function
 is not a core functionality of the project and is merely included as a convenience for the user/instructor/grader
 to help visualize the structure with the assistance of http://webgraphviz.com/.</p>
@@ -79,7 +79,24 @@ to help visualize the structure with the assistance of http://webgraphviz.com/.<
 <p>At this point, all menu functions work although there is no error handling. Therefore at this time, the program
 relies on the user to ensure that they are providing inputs in the expected format (e.g. strings and integers).</p>
 <b>Results:</b>
-The program runs successfully and implements the 2-3 Tree according to the provided invarients. 
+<p>The program runs successfully and implements the 2-3 Tree according to the listed invariants. During initial 
+testing, I experimented with trees as large as about 30 records (~20 nodes) and it seems to work. Notably, and I'll
+describe this further in the next section, I do have an intermittent with memory allocation which is, at the moment,
+undiagnosed. However, it generally does not prevent the program from working.</p>
+<p></p>
+<b>Challenges and Problems:</b>
+<p>Although the program generally works well and always follows the invariants, there is a memory allocation <i>malloc</i>
+problem that intermittently presents itself and that I don't fully understand with my level of C++ knowledge. I say
+intermittent because it only sometimes appears when the program is trying create a new node--it generally occurs
+(if it's going to at all) sometime between the 15th and 25th insertion event, and I've never seen it before the 12th
+insertion event. Often, it does not appear at all before the 30th insertion which is the furthest I've ever tried to go.
+I've included a screenshot of the malloc error in project directory as "malloc_error.png." Unfortunately there simply isn't 
+time remaining for me to continue trying to troubleshoot this error, and although it limits the ultimate size of the tree
+I don't think it is critical to understanding the core functionality of the demonstration.</p>
+<p></p>
+<p>Other than that, the program was overall challenging to create simply due to the volume of code required to implement
+a B-Tree (at least for me). Finding the time to work on this outside of work and family was especially problematic although
+it was helpful that I had created a similar implementation for HW-5 extra credit back in week 7.</p>
 <p></p>
 <b>References:</b>
 <p>
