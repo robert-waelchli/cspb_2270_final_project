@@ -2,8 +2,9 @@ Robert Waelchli | CSPB-2270, Fall 2024
 <h3>Final Project Walkthrough/Readme - 2-3 Tree</h3>
 <p></p>
 <b>Project goal:</b>
-<p>Create an example implementation of a 2-3 Tree data structure. For this example, I choose to
-implement the 2-3 tree as a directory of professionals (including names, phone numbers, occupation).</p>
+<p>Create an example implementation of a 2-3 Tree data structure. For this example, I chose to
+implement the 2-3 tree as a directory of professionals (including fields for name, phone number,
+and occupation).</p>
 <p></p>
 <b>2-3 Tree Definition and Invariants:</b>
 <p>A 2-3 tree is a tree data structure where each node has either two or three children, essentially a B-tree of 
@@ -71,7 +72,7 @@ has options for the following actions:
 > 6. Print current tree
 > 7. Quit and Exit
 
-Option 6, to print the current tree, copies code directly from the B-Tree Assignment #5 of our course, CSPB-2270. 
+Option 6, to print the current tree, uses copied code directly from the B-Tree Assignment #5 of our course, CSPB-2270. 
 [3] I judged this to be an acceptable re-use of that code--with attribution of course--given that the print function
 is not a core functionality of the project and is merely included as a convenience for the user/instructor/grader
 to help visualize the structure with the assistance of http://webgraphviz.com/.</p>
@@ -81,8 +82,8 @@ relies on the user to ensure that they are providing inputs in the expected form
 <b>Results:</b>
 <p>The program runs successfully and implements the 2-3 Tree according to the listed invariants. During initial 
 testing, I experimented with trees as large as about 30 records (~20 nodes) and it seems to work. Notably, and I'll
-describe this further in the next section, I do have an intermittent with memory allocation which is, at the moment,
-undiagnosed. However, it generally does not prevent the program from working.</p>
+describe this further in the next section, I do have an intermittent error with memory allocation which is, at the 
+moment, undiagnosed. However, it generally does not prevent the program from working.</p>
 <p></p>
 <b>Challenges and Problems:</b>
 <p>Although the program generally works well and always follows the invariants, there is a memory allocation <i>malloc</i>
@@ -96,7 +97,8 @@ I don't think it is critical to understanding the core functionality of the demo
 <p></p>
 <p>Other than that, the program was overall challenging to create simply due to the volume of code required to implement
 a B-Tree (at least for me). Finding the time to work on this outside of work and family was especially problematic although
-it was helpful that I had created a similar implementation for HW-5 extra credit back in week 7.</p>
+it was helpful that I had created a similar implementation for HW-5 extra credit back in week 7. That experience served
+somewhat as a guide for me and helped inform my experience--to some extent it helped me decide what NOT to do again.</p>
 <p></p>
 <b>References:</b>
 <p>
